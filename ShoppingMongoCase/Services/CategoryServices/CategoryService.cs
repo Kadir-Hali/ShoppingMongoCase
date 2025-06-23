@@ -1,32 +1,51 @@
-﻿using ShoppingMongoCase.Dtos.CategoryDtos;
+﻿using AutoMapper;
+using MongoDB.Driver;
+using ShoppingMongoCase.Dtos.CategoryDtos;
+using ShoppingMongoCase.Entities;
+using ShoppingMongoCase.Settings;
 
 namespace ShoppingMongoCase.Services.CategoryServices
 {
     public class CategoryService : ICategoryService
     {
-        public Task CreateCategoryAsync(CreateCategoryDto createCategoryDto)
+        private readonly IMapper _mapper;
+        private readonly IMongoCollection<Category> _categoryCollection;
+        public CategoryService(IMapper mapper, IDatabaseSettings _databaseSettings)
         {
-            throw new NotImplementedException();
+            var client = new MongoClient(_databaseSettings.ConnectionString);
+            var database = client.GetDatabase(_databaseSettings.DatabaseName);
+            _categoryCollection = database.GetCollection<Category>(_databaseSettings.CategoryCollectionName);
+            _mapper = mapper;
         }
 
-        public Task DeleteCategoryAsync(string id)
+
+        public async Task CreateCategoryAsync(CreateCategoryDto createCategoryDto)
         {
-            throw new NotImplementedException();
+            var value = _mapper.Map<Category>(createCategoryDto);
+            await _categoryCollection.InsertOneAsync(value);
         }
 
-        public Task<List<ResultCategoryDto>> GetAllCategoryAsync()
+        public async Task DeleteCategoryAsync(string id)
         {
-            throw new NotImplementedException();
+            await _categoryCollection.DeleteOneAsync(x => x.CategoryId == id);
         }
 
-        public Task<GetCategoryByIdDto> GetCategoryByIdAsync(string id)
+        public async Task<List<ResultCategoryDto>> GetAllCategoryAsync()
         {
-            throw new NotImplementedException();
+            var values = await _categoryCollection.Find(x => true).ToListAsync();
+            return _mapper.Map<List<ResultCategoryDto>>(values);
         }
 
-        public Task UpdateCategoryAsync(UpdateCategoryDto updateCategoryDto)
+        public async Task<GetCategoryByIdDto> GetCategoryByIdAsync(string id)
         {
-            throw new NotImplementedException();
+            var value = await _categoryCollection.Find(x => x.CategoryId == id).FirstOrDefaultAsync();
+            return _mapper.Map<GetCategoryByIdDto>(value);
+        }
+
+        public async Task UpdateCategoryAsync(UpdateCategoryDto updateCategoryDto)
+        {
+            var value = _mapper.Map<Category>(updateCategoryDto);
+            await _categoryCollection.FindOneAndReplaceAsync(x => x.CategoryId == updateCategoryDto.CategoryId, value);
         }
     }
 }
