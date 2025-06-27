@@ -1,32 +1,50 @@
-﻿using ShoppingMongoCase.Dtos.ProductDtos;
+﻿using AutoMapper;
+using MongoDB.Driver;
+using ShoppingMongoCase.Dtos.ProductDtos;
+using ShoppingMongoCase.Entities;
+using ShoppingMongoCase.Settings;
 
 namespace ShoppingMongoCase.Services.ProductServices
 {
     public class ProductService : IProductService
     {
-        public Task CreateProductAsync(CreateProductDto createProductDto)
+        private readonly IMapper _mapper;
+        private readonly IMongoCollection<Product> _productCollection;
+        public ProductService(IMapper mapper, IDatabaseSettings _databaseSettings)
         {
-            throw new NotImplementedException();
+            var client = new MongoClient(_databaseSettings.ConnectionString);
+            var database = client.GetDatabase(_databaseSettings.DatabaseName);
+            _productCollection = database.GetCollection<Product>(_databaseSettings.ProductCollectionName);
+            _mapper = mapper;
         }
 
-        public Task DeleteProductAsync(string id)
+        public async Task CreateProductAsync(CreateProductDto createProductDto)
         {
-            throw new NotImplementedException();
+            var value = _mapper.Map<Product>(createProductDto);
+            await _productCollection.InsertOneAsync(value);
         }
 
-        public Task<List<ResultProductDto>> GetAllProductAsync()
+        public async Task DeleteProductAsync(string id)
         {
-            throw new NotImplementedException();
+            await _productCollection.DeleteOneAsync(x => x.ProductId == id);
         }
 
-        public Task<GetProductByIdDto> GetProductByIdAsync(string id)
+        public async Task<List<ResultProductDto>> GetAllProductAsync()
         {
-            throw new NotImplementedException();
+            var values = await _productCollection.Find(x => true).ToListAsync();
+            return _mapper.Map<List<ResultProductDto>>(values);
         }
 
-        public Task UpdateProductAsync(UpdateProductDto updateProductDto)
+        public async Task<GetProductByIdDto> GetProductByIdAsync(string id)
         {
-            throw new NotImplementedException();
+            var value = await _productCollection.Find(x => x.ProductId == id).FirstOrDefaultAsync();
+            return _mapper.Map<GetProductByIdDto>(value);
+        }
+
+        public async Task UpdateProductAsync(UpdateProductDto updateProductDto)
+        {
+            var value = _mapper.Map<Product>(_productCollection);
+            await _productCollection.FindOneAndReplaceAsync(x => x.ProductId == updateProductDto.ProductId, value);
         }
     }
 }
