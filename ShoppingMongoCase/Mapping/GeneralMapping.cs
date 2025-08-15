@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using ShoppingMongoCase.Dtos.CategoryDtos;
-using ShoppingMongoCase.Dtos.CustomerDtos;
 using ShoppingMongoCase.Dtos.ProductDtos;
+using ShoppingMongoCase.Dtos.ProductImageDtos;
+using ShoppingMongoCase.Dtos.SliderDtos;
 using ShoppingMongoCase.Entities;
 
 namespace ShoppingMongoCase.Mapping
@@ -15,15 +16,20 @@ namespace ShoppingMongoCase.Mapping
             CreateMap<Category, UpdateCategoryDto>().ReverseMap();
             CreateMap<Category, GetCategoryByIdDto>().ReverseMap();
 
-            CreateMap<Customer, CreateCustomerDto>().ReverseMap();
-            CreateMap<Customer, ResultCustomerDto>().ReverseMap();
-            CreateMap<Customer, UpdateCustomerDto>().ReverseMap();
-            CreateMap<Customer, GetCustomerByIdDto>().ReverseMap();
+            CreateMap<Slider, CreateSliderDto>().ReverseMap();
+            CreateMap<Slider, ResultSliderDto>().ReverseMap();
+            CreateMap<Slider, UpdateSliderDto>().ReverseMap();
+            CreateMap<Slider, GetSliderDto>().ReverseMap();
 
             CreateMap<Product, CreateProductDto>().ReverseMap();
             CreateMap<Product, ResultProductDto>().ReverseMap();
             CreateMap<Product, UpdateProductDto>().ReverseMap();
             CreateMap<Product, GetProductByIdDto>().ReverseMap();
+
+            CreateMap<ProductImage, CreateProductImageDto>().ReverseMap();
+            CreateMap<ProductImage, UpdateProductImageDto>().ReverseMap();
+            CreateMap<ProductImage, ResultProductImageDto>().ReverseMap();
+            CreateMap<ProductImage, GetProductImageDto>().ReverseMap();
         }
     }
 }

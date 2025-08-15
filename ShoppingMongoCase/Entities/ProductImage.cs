@@ -3,12 +3,13 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ShoppingMongoCase.Entities
 {
-    public class Category
+    public class ProductImage
     {
-        [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string CategoryId { get; set; }
-        public string CategoryName { get; set; }
+        public string ProductImageId { get; set; }
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string ProductId { get; set; }
         public string ImageUrl { get; set; }
     }
 }
