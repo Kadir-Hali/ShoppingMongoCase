@@ -32,19 +32,38 @@ namespace ShoppingMongoCase.Services.ProductImageServices
             await _productImageCollection.DeleteOneAsync(x => x.ProductImageId == id);
         }
 
-        public Task<List<ResultProductImageDto>> GetAllProductImageAsync()
+        public async Task<List<ResultProductImageDto>> GetAllProductImageAsync()
         {
-            throw new NotImplementedException();
+            var productImages = await _productImageCollection.Find(x => true).ToListAsync();
+            var products = await _productCollection.Find(x => true).ToListAsync();
+
+            var result = productImages.Select(img =>
+            {
+                var dto = _mapper.Map<ResultProductImageDto>(img);
+                var product = products.FirstOrDefault(p => p.ProductId == img.ProductId);
+                dto.ProductName = product?.ProductName;
+                return dto;
+            }).ToList();
+
+            return result;
         }
 
-        public Task<GetProductImageDto> GetProductImageByIdAsync(string id)
+        public async Task<GetProductImageDto> GetProductImageByIdAsync(string id)
         {
-            throw new NotImplementedException();
+            var productImage = await _productImageCollection.Find(x => x.ProductImageId == id).FirstOrDefaultAsync();
+            var dto = _mapper.Map<GetProductImageDto>(productImage);
+
+            var product = await _productCollection.Find(x => x.ProductId == productImage.ProductId).FirstOrDefaultAsync();
+            dto.ProductName = product?.ProductName;
+
+            return dto;
         }
 
-        public Task UpdateProductImageAsync(UpdateProductImageDto updateProductImageDto)
+        public async Task UpdateProductImageAsync(UpdateProductImageDto updateProductImageDto)
         {
-            throw new NotImplementedException();
+            var productImage = _mapper.Map<ProductImage>(updateProductImageDto);
+            await _productImageCollection.FindOneAndReplaceAsync(x => x.ProductImageId == updateProductImageDto.ProductImageId, 
+                productImage);
         }
     }
 }
