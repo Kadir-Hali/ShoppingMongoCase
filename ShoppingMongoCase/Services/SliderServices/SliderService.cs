@@ -18,29 +18,33 @@ namespace ShoppingMongoCase.Services.SliderServices
             _sliderCollection = database.GetCollection<Slider>(_databaseSettings.SliderCollectionName);
             _mapper = mapper;
         }
-        public Task CreateSliderAsync(CreateSliderDto createSliderDto)
+        public async Task CreateSliderAsync(CreateSliderDto createSliderDto)
         {
-            throw new NotImplementedException();
+            var slider = _mapper.Map<Slider>(createSliderDto);
+            await _sliderCollection.InsertOneAsync(slider);
         }
 
-        public Task DeleteSliderAsync(string id)
+        public async Task DeleteSliderAsync(string id)
         {
-            throw new NotImplementedException();
+            await _sliderCollection.DeleteOneAsync(x => x.SliderId == id);
         }
 
-        public Task<List<ResultSliderDto>> GetAllSliderAsync()
+        public async Task<List<ResultSliderDto>> GetAllSliderAsync()
         {
-            throw new NotImplementedException();
+            var sliders = await _sliderCollection.Find(x => true).ToListAsync();
+            return _mapper.Map<List<ResultSliderDto>>(sliders);
         }
 
-        public Task<GetSliderDto> GetSliderByIdAsync(string id)
+        public async Task<GetSliderDto> GetSliderByIdAsync(string id)
         {
-            throw new NotImplementedException();
+            var slider = await _sliderCollection.Find(x => x.SliderId == id).FirstOrDefaultAsync();
+            return _mapper.Map<GetSliderDto>(slider);
         }
 
-        public Task UpdateSliderAsync(UpdateSliderDto updateSliderDto)
+        public async Task UpdateSliderAsync(UpdateSliderDto updateSliderDto)
         {
-            throw new NotImplementedException();
+            var slider = _mapper.Map<Slider>(updateSliderDto);
+            await _sliderCollection.FindOneAndReplaceAsync(x => x.SliderId == updateSliderDto.SliderId, slider);
         }
     }
 }
