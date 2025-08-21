@@ -1,15 +1,19 @@
 using Microsoft.Extensions.Options;
 using ShoppingMongoCase.Services.CategoryServices;
-using ShoppingMongoCase.Services.CustomerServices;
+using ShoppingMongoCase.Services.ProductImageServices;
 using ShoppingMongoCase.Services.ProductServices;
+using ShoppingMongoCase.Services.SliderServices;
 using ShoppingMongoCase.Settings;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllersWithViews();
+
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ISliderService, SliderService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductImageService, ProductImageService>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
@@ -19,8 +23,6 @@ builder.Services.AddScoped<IDatabaseSettings>(sp =>
 {
     return sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
 });
-
-builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
